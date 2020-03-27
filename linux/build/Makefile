@@ -24,12 +24,13 @@ LDFLAGS 		= -fPIC -o3
 LIBS			= $(THREAD_LIBS)
 
 BASIC_OBJS		= 	$(SRC_PATH)/basic/basic.o 								\
-					$(SRC_PATH)/basic/basic_string.o 						\
-					$(SRC_PATH)/basic/basic_time.o 							\
-					$(SRC_PATH)/basic/basic_reference.o
+					$(SRC_PATH)/basic/callback/basic_sync_callback.o 		\
+					$(SRC_PATH)/basic/callback/basic_sync_callback_define.o	\
+					$(SRC_PATH)/basic/callback/basic_async_callback.o		\
+					$(SRC_PATH)/basic/callback/basic_async_callback_define.o\
 
 all:
 	$(MAKE) -f makefile.basic CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" BUILD_PATH="$(BUILD_PATH)" THREAD_PATH="$(THREAD_PATH)" FRAMEWORK_PATH="$(FRAMEWORK_PATH)" LIBS="$(LIBS)" SRC_PATH="$(SRC_PATH)" BASIC_OBJS="$(BASIC_OBJS)"
 
 clean:
-	$(MAKE) -f makefile.basic clean CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" BUILD_PATH="$(BUILD_PATH)" THREAD_PATH="$(THREAD_PATH)" FRAMEWORK_PATH="$(FRAMEWORK_PATH)" LIBS="$(LIBS)" SRC_PATH="$(SRC_PATH)"
+	$(MAKE) -f makefile.basic clean CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" BUILD_PATH="$(BUILD_PATH)" THREAD_PATH="$(THREAD_PATH)" FRAMEWORK_PATH="$(FRAMEWORK_PATH)" LIBS="$(LIBS)" LDFLAGS="$(LDFLAGS)" SRC_PATH="$(SRC_PATH)"
