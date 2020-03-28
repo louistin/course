@@ -1,11 +1,11 @@
-BIN				= basic_callback
+BIN				= basic_epoll_server
 SRC				= $(SRC_PATH)
 
 STATIC_LIBS		= $(LIBS)
 SHARED_LIBS		= -lpthread
 SHARED_DIR		=
 
-OBJS			=	$(BASIC_CALLBACK_OBJS)									\
+OBJS			=	$(BASIC_IO_EPOLL_SERVER_OBJS)									\
 					$(SRC)/basic/main.o
 
 all: $(BUILD_PATH)/$(BIN)
@@ -18,4 +18,4 @@ $(BUILD_PATH)/$(BIN):$(OBJS)
 clean:
 	rm -f $(BUILD_PATH)/$(BIN)
 	rm -rf $(SRC)/basic/*.o
-	rm -rf $(SRC)/basic/callback/*.o
+	rm -rf $(SRC)/basic/io/*.o

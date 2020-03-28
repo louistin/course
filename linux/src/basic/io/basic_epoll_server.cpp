@@ -37,7 +37,7 @@ static int basic_epoll_server_create() {
     struct sockaddr_in saddr, caddr;
     memset(&saddr, 0, sizeof(saddr));
     saddr.sin_family = AF_INET;
-    saddr.sin_port = htons((short)EPOLL_PORT);
+    saddr.sin_port = htons((short)EPOLL_SERVER_PORT);
     saddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(fd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
@@ -96,7 +96,7 @@ static int basic_epoll_server_create() {
                     return -1;
                 }
 
-                LOG_INFO("recv message: %s", buffer);
+                LOG_INFO("recv client message: %s", buffer);
 
                 ev.data.fd = fd;
                 ev.events = EPOLLOUT;
@@ -113,6 +113,8 @@ static int basic_epoll_server_create() {
                     close(epfd);
                     return -1;
                 }
+
+                LOG_INFO("send message to client: %s", buffer);
 
                 ev.data.fd = events[i].data.fd;
                 epoll_ctl(epfd, EPOLL_CTL_DEL, ev.data.fd, &ev);

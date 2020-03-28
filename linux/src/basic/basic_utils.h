@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <pthread.h>
+using namespace std;
 
 // epoll server
 #include <sys/types.h>
@@ -21,10 +22,11 @@
 #include <arpa/inet.h>
 #include <signal.h>
 
-using namespace std;
 
-#define EPOLL_MAXFDS                    256
-#define EPOLL_EVENTS                    64
-#define EPOLL_PORT                      1080
+
+#define EPOLL_MAXFDS                            256
+#define EPOLL_EVENTS                            64
+#define EPOLL_SERVER_PORT                       1080
+#define EPOLL_CLIENT_PORT                       1920
 
 #endif
