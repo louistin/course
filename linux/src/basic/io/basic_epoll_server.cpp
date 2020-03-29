@@ -21,24 +21,48 @@ static int basic_epoll_server_set_nonblock(int fd) {
     return 0;
 }
 
+static int basic_epoll_server_set_reusable(int fd) {
+    int on = 0;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+    return 0;
+}
+
 static int basic_epoll_server_create() {
+    struct epoll_event ev;
+    struct epoll_event events[EPOLL_EVENTS];
+
+    int epfd = epoll_create(EPOLL_MAXFDS);
+    LOG_INFO("create epoll fd.");
+
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
-        LOG_ERROR("create socket error.");
+        LOG_ERROR("create socket error. %s", errno);
         return -1;
     }
 
-    basic_epoll_server_sigaction();
+    LOG_INFO("create server fd.");
 
-    int on = 1;
-    int epfd = epoll_create(EPOLL_MAXFDS);
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    basic_epoll_server_set_nonblock(fd);
+    basic_epoll_server_set_reusable(fd);
+
+    ev.data.fd = fd;
+    ev.events = EPOLLIN | EPOLLET;
+    // 注册 epoll 事件
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) < 0) {
+        LOG_ERROR("epoll add fd error.");
+        close(fd);
+        close(epfd);
+        return -1;
+    }
+
+    LOG_INFO("add fd EOPLLIN event to epoll.");
 
     struct sockaddr_in saddr, caddr;
     memset(&saddr, 0, sizeof(saddr));
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons((short)EPOLL_SERVER_PORT);
-    saddr.sin_addr.s_addr = INADDR_ANY;
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(fd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
         LOG_ERROR("bind error.");
@@ -47,6 +71,8 @@ static int basic_epoll_server_create() {
         return -1;
     }
 
+    LOG_INFO("bind server fd port{%u} success.", saddr.sin_port);
+
     if (listen(fd, 32) < 0) {
         LOG_ERROR("listen error.");
         close(fd);
@@ -54,19 +80,16 @@ static int basic_epoll_server_create() {
         return -1;
     }
 
-    struct epoll_event ev;
-    struct epoll_event events[EPOLL_EVENTS];
-
-    ev.data.fd = fd;
-    ev.events = EPOLLIN;
-    epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
+    LOG_INFO("server fd start to listen...");
 
     int cfd;
     int nfds;
     int ret;
     char buffer[1024];
     for (;;) {
-        nfds = epoll_wait(epfd, events, EPOLL_MAXFDS, 0);
+        LOG_INFO("epoll wait ...");
+        nfds = epoll_wait(epfd, events, EPOLL_MAXFDS, 500);
+        LOG_INFO("epoll return...");
 
         for (int i = 0; i < nfds; i++) {
             if (fd == events[i].data.fd) {
@@ -78,13 +101,16 @@ static int basic_epoll_server_create() {
                     break;
                 }
 
+                LOG_INFO("accept client fd, [%s:%u].", inet_ntoa(caddr.sin_addr), ntohs(caddr.sin_port));
+
                 basic_epoll_server_set_nonblock(cfd);
 
                 ev.data.fd = cfd;
-                ev.events = EPOLLIN;
+                ev.events = EPOLLIN | EPOLLET;
                 epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev);
+                LOG_INFO("add client fd EOPLLIN event to epoll.");
 
-            } else if (events[i].data.fd & EPOLLIN) {
+            } else if (events[i].events & EPOLLIN) {
                 memset(buffer, 0, sizeof(buffer));
 
                 LOG_INFO("read client message...");
@@ -98,11 +124,13 @@ static int basic_epoll_server_create() {
 
                 LOG_INFO("recv client message: %s", buffer);
 
-                ev.data.fd = fd;
-                ev.events = EPOLLOUT;
+                ev.data.fd = events[i].data.fd;
+                ev.events = EPOLLOUT | EPOLLET;
                 epoll_ctl(epfd, EPOLL_CTL_MOD, events[i].data.fd, &ev);
 
-            } else if (events[i].data.fd & EPOLLOUT) {
+                LOG_INFO("add fd EOPLLOUT event to epoll.");
+
+            } else if (events[i].events & EPOLLOUT) {
                 memset(buffer, 0, sizeof(buffer));
                 sprintf(buffer, "%s", "louis.tianlu@gmail.com");
 
@@ -118,6 +146,8 @@ static int basic_epoll_server_create() {
 
                 ev.data.fd = events[i].data.fd;
                 epoll_ctl(epfd, EPOLL_CTL_DEL, ev.data.fd, &ev);
+
+                LOG_INFO("del fd from epoll.");
             }
         }
     }
@@ -136,6 +166,7 @@ static int basic_epoll_server_create() {
 
 
 int basic_epoll_server_init() {
+    basic_epoll_server_sigaction();
     basic_epoll_server_create();
 
     return 0;

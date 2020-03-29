@@ -2,7 +2,9 @@
 #define __BASIC_UTILS_H__
 
 #define LOG_TAG                         "basic"
+extern "C" {
 #include "elog.h"
+}
 
 #include <iostream>
 #include <string>

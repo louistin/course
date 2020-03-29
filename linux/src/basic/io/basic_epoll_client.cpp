@@ -7,6 +7,8 @@ static int basic_epoll_client_create() {
     if (fd < 0) {
         LOG_ERROR("socket create error.");
         return -1;
+    } else {
+        LOG_INFO("socket create.");
     }
 
     int on = 1;
@@ -22,6 +24,8 @@ static int basic_epoll_client_create() {
     if (connect(fd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
         LOG_ERROR("connect error");
         return -1;
+    } else {
+        LOG_INFO("connect success.");
     }
 
     char buff[1024];
@@ -36,7 +40,16 @@ static int basic_epoll_client_create() {
 
     LOG_INFO("client recv: %s", buff);
 
+    send(fd, buff, strlen(buff), 0);
+    LOG_INFO("client send: %s", buff);
+
+    memset(buff, 0, sizeof(buff));
+    recv(fd, buff, sizeof(buff), 0);
+
+    LOG_INFO("client recv: %s", buff);
+
     close(fd);
+    LOG_INFO("close socket fd");
 
     return 0;
 }
