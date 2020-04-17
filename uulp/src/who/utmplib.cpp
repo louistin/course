@@ -4,6 +4,8 @@
 #include <utmp.h>
 #include <unistd.h>
 
+#include "utmplib.h"
+
 #define NRECS   16
 #define NULLUT  ((struct utmp *)NULL)
 #define UTSIZE  (sizeof(struct utmp))
