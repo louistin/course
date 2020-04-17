@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "utmplib.h"
+
 //#define SHOWHOST
 
 static void show_time(long timeval) {
@@ -46,8 +48,25 @@ static void who1() {
     close(utmp_fd);
 }
 
+static void who2() {
+    struct utmp *utbufp;
+
+    if (utmp_open(UTMP_FILE) == -1) {
+        perror(UTMP_FILE);
+        exit(1);
+    }
+
+    while ((utbufp = utmp_next()) != (struct utmp *)NULL) {
+        show_info(utbufp);
+    }
+
+    utmp_close();
+}
+
 int main(int argc, char const *argv[]) {
-    who1();
+    //who1();
+
+    who2();
 
     return 0;
 }

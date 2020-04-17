@@ -5,7 +5,7 @@ STATIC_LIBS		= $(LIBS)
 SHARED_LIBS		= -lpthread
 SHARED_DIR		=
 
-OBJS			=	$(MORE_OBJS)									\
+OBJS			=	$(CP_OBJS)									\
 					$(SRC)/cp/cp.o
 
 all: $(BUILD_PATH)/$(BIN)
