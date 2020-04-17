@@ -29,7 +29,7 @@ static void show_info(struct utmp *buff) {
     printf("\n");
 }
 
-int main(int argc, char const *argv[]) {
+static void who1() {
     struct utmp current_record;
     int record_len = sizeof(struct utmp);
     int utmp_fd;
@@ -44,6 +44,10 @@ int main(int argc, char const *argv[]) {
     }
 
     close(utmp_fd);
+}
+
+int main(int argc, char const *argv[]) {
+    who1();
 
     return 0;
 }
