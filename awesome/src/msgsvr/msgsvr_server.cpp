@@ -13,6 +13,32 @@ typedef struct {
   void *recv_queue;
 } msgsvr_server_t;
 
+static int msgsvr_server_received(
+  void *context,
+  void *args,
+  msgsvr_message_t *message) {
+
+  return OK;
+}
+
+static int msgsvr_server_connected(
+  void *context,
+  void *args,
+  const char *remote_ip,
+  unsigned short remote_port){
+
+  return OK;
+}
+
+static int msgsvr_server_closed(
+  void *hanlder,
+  void *args,
+  const char *remote_ip,
+  unsigned short remote_port) {
+
+  return OK;
+}
+
 int msgsvr_server_init(
   void **handler,
   const char *transport,
@@ -41,6 +67,24 @@ int msgsvr_server_init(
   if (strcasecmp(transport, "tcp") == 0) {
     // 创建 tcpserver
     // 创建 tcpclient
+    if (msgsvr_tcpserver_create(
+      &server->context,
+      local_ip,
+      local_port,
+      max_connectors,
+      buffer_size,
+      recv_buffer_size,
+      -1,
+      msgsvr_server_received,
+      msgsvr_server_connected,
+      msgsvr_server_closed,
+      server) != OK) {
+      LOG_ERROR("tcpserver create error.\n");
+      return ERROR;
+    }
+
+    LOG_INFO("tcpserver create ok.\n");
+
   } else {
     LOG_ERROR("transport: %s is not support.\n", transport);
     return ERROR;

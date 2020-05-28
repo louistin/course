@@ -12,6 +12,7 @@ int main(int argc, char const *argv[])
 
   memset(local_ip, 0, sizeof(local_ip));
   sprintf(local_ip, "%s", "127.0.0.1");
+  local_port = 9999;
 
   /*
     void **handler,
@@ -37,9 +38,11 @@ int main(int argc, char const *argv[])
     1024,
     1024
     ) != OK) {
-    LOG_ERROR("msgsvr servr init error.\n");
+    LOG_ERROR("msgsvr server init error.\n");
     return ERROR;
   }
+
+  LOG_INFO("msgsvr server init ok.\n");
 
   while (1) {
     sleep(1);

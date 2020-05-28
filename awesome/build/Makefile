@@ -15,10 +15,10 @@ OPTIMIZE 		=
 WARN 			= -Wall
 DEFS 			=
 INCLUDE			= -I$(THREAD_PATH)/easylogger/include				\
-							-I$(THREAD_PATH)/libevent/include
+							-I$(THREAD_PATH)/libevent2/include
 
 THREAD_LIBS		= $(THREAD_PATH)/easylogger/lib/libeasylogger.a		\
-								$(THREAD_PATH)/libevent/lib/libevent.a
+								$(THREAD_PATH)/libevent2/lib/libevent.a
 
 CXXFLAGS		= -g $(DEBUG) $(WARN) $(OPTIMIZE) -fPIC $(DEFS) $(INCLUDE)
 CFLAGS			= -g $(DEBUG) $(WARN) $(OPTIMIZE) -fPIC $(DEFS) $(INCLUDE)
@@ -29,6 +29,7 @@ MSGSVR_OBJS	= 	$(SRC_PATH)/msgsvr/msgsvr.o		\
 												$(SRC_PATH)/msgsvr/msgsvr_queue.o		\
 												$(SRC_PATH)/msgsvr/msgsvr_server.o	\
 												$(SRC_PATH)/msgsvr/msgsvr_tcpserver.o		\
+												$(SRC_PATH)/msgsvr/msgsvr_libevent_tcpserver.o		\
 												$(SRC_PATH)/msgsvr/msgsvr_util.o		\
 
 all:

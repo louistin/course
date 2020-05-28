@@ -5,11 +5,26 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <time.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <queue>
+#include <map>
+#include <string>
 
 #include "elog.h"
 #include "elog_cfg.h"
+#include "event2/bufferevent.h"
+#include "event2/listener.h"
+#include "event2/buffer.h"
 
 #define MSGSVR_MESSAGE_BODY_MAX 1024
 
