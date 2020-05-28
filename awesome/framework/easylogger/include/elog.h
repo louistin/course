@@ -39,7 +39,7 @@
 extern "C" {
 #endif
 
-// 娓呴櫎 __FILE__ 涓殑璺緞, 鍙繚鐣欏嚱鏁板悕
+// 清除__FILE__ 中的路径
 // windows #define filename(x) strrchr(x,'\\')?strrchr(x,'\\')+1:x
 #define FILENAME(x) strrchr(x,'/')?strrchr(x,'/')+1:x
 
