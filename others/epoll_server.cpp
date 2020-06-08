@@ -1,19 +1,19 @@
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/epoll.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <time.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <unistd.h>
 
 #define SERVER_PORT 10001
-#define MAX_EVENTS  1024
-#define BUFF_LEN    1024
+#define MAX_EVENTS 1024
+#define BUFF_LEN 1024
 
 typedef void (*event_callback)(int fd, int events, void *arg);
 
@@ -22,7 +22,8 @@ struct event_s {
   int events;
   void *arg;
   // MAJOR: EventHandler 事件处理接口
-  // 一个或多个模板函数组成的接口, 这些模板函数描述了和应用程序相关的对某个事件的操作
+  // 一个或多个模板函数组成的接口,
+  // 这些模板函数描述了和应用程序相关的对某个事件的操作
   event_callback call_back;
   int status;
   char buff[BUFF_LEN];
@@ -34,9 +35,10 @@ int g_epfd;
 struct event_s g_events[MAX_EVENTS + 1];
 
 // MAJOR: Reactor 管理器
-// 定义了一些接口, 用于应用程序控制事件调度, 以及应用程序注册, 删除事件处理器和相关描述符.
-// 也包括了 event_add, event_del
-void event_set(struct event_s *ev, int fd, event_callback call_back, void *arg) {
+// 定义了一些接口, 用于应用程序控制事件调度, 以及应用程序注册,
+// 删除事件处理器和相关描述符. 也包括了 event_add, event_del
+void event_set(struct event_s *ev, int fd, event_callback call_back,
+               void *arg) {
   ev->fd = fd;
   ev->call_back = call_back;
   ev->events = 0;
@@ -62,8 +64,8 @@ void event_add(int epfd, int events, struct event_s *ev) {
   if (epoll_ctl(epfd, op, ev->fd, &epv) < 0) {
     printf("event add failed [fd = %d], events[%d]\n", ev->fd, events);
   } else {
-    printf("event add ok [fd = %d], op = %d,  events[%X]\n",
-            ev->fd, op, events);
+    printf("event add ok [fd = %d], op = %d,  events[%X]\n", ev->fd, op,
+           events);
   }
 }
 
@@ -116,7 +118,7 @@ void recv_cb(int fd, int events, void *arg) {
     event_add(g_epfd, EPOLLOUT, ev);
   } else if (len == 0) {
     close(ev->fd);
-    printf("[fd = %d] pos[%d] closed\n", fd, (int) (ev - g_events));
+    printf("[fd = %d] pos[%d] closed\n", fd, (int)(ev - g_events));
   } else {
     close(ev->fd);
     printf("recv[fd = %d] error[%d]: %s\n", fd, errno, strerror(errno));
@@ -164,8 +166,8 @@ void accept_connect_cb(int fd, int events, void *arg) {
     event_add(g_epfd, EPOLLIN, &g_events[i]);
   } while (0);
 
-  printf("new connect [%s:%d][time:%ld], pos[%d]\n",
-        inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), g_events[i].last_active, i);
+  printf("new connect [%s:%d][time:%ld], pos[%d]\n", inet_ntoa(sa.sin_addr),
+         ntohs(sa.sin_port), g_events[i].last_active, i);
 }
 
 void init_listen_socket(int epfd, unsigned short port) {
@@ -177,7 +179,8 @@ void init_listen_socket(int epfd, unsigned short port) {
 
   fcntl(fd, F_SETFL, O_NONBLOCK);
 
-  event_set(&g_events[MAX_EVENTS], fd, accept_connect_cb, &g_events[MAX_EVENTS]);
+  event_set(&g_events[MAX_EVENTS], fd, accept_connect_cb,
+            &g_events[MAX_EVENTS]);
   event_add(epfd, EPOLLIN, &g_events[MAX_EVENTS]);
 
   struct sockaddr_in sin;
@@ -190,7 +193,6 @@ void init_listen_socket(int epfd, unsigned short port) {
 
   listen(fd, 20);
 }
-
 
 int main(int argc, char const *argv[]) {
   unsigned short port = SERVER_PORT;
